@@ -3,7 +3,7 @@
   "publisher": "muhammad-sammy",
   "version": "2.160.4",
   "description": "Free/Libre C# support for vscode-compatible editors.",
-  "displayName": "C#",
+  "displayName": "C# (OpenFlame)",
   "author": "Muhammad Sammy",
   "license": "SEE LICENSE IN RuntimeLicenses/license.txt",
   "qna": "https://github.com/muhammadsammy/free-vscode-csharp/issues",
@@ -3312,6 +3312,26 @@
               "name": ".NET Core Attach",
               "type": "coreclr",
               "request": "attach"
+            }
+          },
+          {
+            "label": ".NET: Attach to OpenFlame Service",
+            "description": "Pick a running OpenFlame service process and attach to it.",
+            "body": {
+              "name": "Attach",
+              "type": "coreclr",
+              "request": "attach",
+              "processId": "^\"\\${command:PickOpenflameProcess}\""
+            }
+          },
+          {
+            "label": ".NET: Run and Attach to OpenFlame Service",
+            "description": "Start the configured OpenFlame service, then attach to its process.",
+            "body": {
+              "name": "Run and Attach",
+              "type": "coreclr",
+              "request": "attach",
+              "processId": "^\"\\${command:RunOpenflameProcess}\""
             }
           },
           {
