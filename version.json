@@ -1,11 +1,12 @@
 {
   "$schema": "https://raw.githubusercontent.com/dotnet/Nerdbank.GitVersioning/master/src/NerdBank.GitVersioning/version.schema.json",
-  "version": "2.160",
+  "version": "2.160.4-openflame.1",
   "publicReleaseRefSpec": [
     "^refs/heads/release$",
     "^refs/heads/prerelease$",
     "^refs/heads/main$",
-    "^refs/heads/patch/.*$"
+    "^refs/heads/patch/.*$",
+    "^refs/heads/openflame-.*$"
   ],
   "cloudBuild": {
     "buildNumber": {
