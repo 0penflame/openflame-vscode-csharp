@@ -79,6 +79,43 @@ npx ts-node -e "require('./tasks/packaging/offlinePackagingTasks').vsixReleasePa
 
 `npm run vsix:release:package` builds every platform the same way.
 
+## Releasing a build
+
+The OpenFlame workspace image does not keep a copy of the `.vsix`: it
+downloads the asset of a GitHub release of this repository and checks it
+against a pinned sha256 (`tools/vsix-releases.txt` and
+`tools/fetch-vsix.sh` in `0penflame/openflame-workspace`).
+This repository is public, so the workspace build downloads the asset
+from the release download URL without a token.
+
+1. Merge the `openflame-<version>` branch into `master` (pull request,
+   squash). Bump the `-openflame.<n>` suffix for an OpenFlame-only
+   rebuild of the same upstream release.
+2. Build the `.vsix` from exactly the head of the merged
+   `openflame-<version>` branch, in a clean checkout, with the build
+   steps above. Releases are tagged there rather than on `master`,
+   because `master` also carries upstream commits made after the
+   release (`v2.160.4-openflame.1` is on the `openflame-2.160.4` head).
+3. Cut the release on that commit, with the `.vsix` as its only asset:
+
+   ```sh
+   V=<version>                       # e.g. 2.160.4-openflame.1
+   SHA=$(git rev-parse HEAD)         # head of the merged openflame-<version> branch
+   cp vsix/csharp-linux-x64-$V.vsix csharp-$V-linux-x64.vsix
+   shasum -a 256 csharp-$V-linux-x64.vsix
+   gh release create "v$V" csharp-$V-linux-x64.vsix --repo 0penflame/openflame-vscode-csharp \
+     --target "$SHA" --title "C# $V" \
+     --notes "Built from $SHA. sha256 of csharp-$V-linux-x64.vsix: <sha256>"
+   ```
+
+   Never replace the asset of an existing release; cut a new version.
+4. In `0penflame/openflame-workspace`, update the `csharp.vsix` line of
+   `tools/vsix-releases.txt` (tag, asset name, sha256) in a pull request.
+   The image build fails if the downloaded asset does not match the pinned
+   sha256. Running workspaces pick up the new build on their next start
+   after the image is rolled out (the entrypoint resyncs bundled extensions
+   whose `.vsix` changed).
+
 ## Rebasing onto the next upstream release
 
 1. `git fetch upstream --tags`
@@ -88,5 +125,4 @@ npx ts-node -e "require('./tasks/packaging/offlinePackagingTasks').vsixReleasePa
    version in `version.json` to `<version>-openflame.1`.
 4. Re-check the "not carried" items above against the new release
    (`src/shared/configurationProvider.ts`, `src/coreclrDebug/activate.ts`).
-5. Build the `linux-x64` package and replace `extensions/csharp.vsix` in
-   openflame-workspace.
+5. Build the `linux-x64` package and release it (see "Releasing a build").
